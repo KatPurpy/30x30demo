@@ -1,0 +1,86 @@
+#include <stdlib.h>
+#include "screen.c"
+#include "audio_manager.c"
+
+typedef struct Object
+{
+   int x,y,character,color;
+}Object;
+
+Object *ObjectsHeap[901];
+
+Object* CreateObject(int x,int y,int character,int color)
+{
+   int ID = -1;
+   while(ObjectsHeap[ID] != NULL)
+	ID++;
+   
+   ObjectsHeap[ID] = malloc(sizeof(Object));
+   ObjectsHeap[ID]->x = x;
+   ObjectsHeap[ID]->y = y;
+   ObjectsHeap[ID]->character = character;
+   ObjectsHeap[ID]->color = color;
+   return ObjectsHeap[ID];
+}
+void DrawChar(int x,int y,int character,int color)
+{
+   Screen_drawParams sdp;
+   sdp.x = x;
+     sdp.y = y;
+     sdp.Character = character;
+   sdp.color_flags = color;
+   Screen_PlotChar(&sdp);
+}
+
+void DrawAllObjects()
+{
+   int ID = -1;
+   
+   Screen_drawParams sdp;
+   
+   while(ObjectsHeap[ID] != NULL)
+     {
+	DrawChar(ObjectsHeap[ID]->x, ObjectsHeap[ID]->y ,ObjectsHeap[ID]->character ,ObjectsHeap[ID]->color);
+	ID++;
+     }
+   Screen_DrawBuffer();
+}
+
+
+int main()
+{
+   Screen_Setup();
+   AudioLibrary_init();
+   
+   char [30][30]=
+     {
+	  {"......."}
+	     
+     };
+   
+   
+   
+   for(int i = 0; i < 901; i++)
+     {
+	ObjectsHeap[i] = NULL;
+     }
+   
+   //payloads stuff
+   
+   for(int i = 0; i<900; i++)
+     {
+	CreateObject(rand()%900,rand()%900,15,15);
+     }
+   
+   
+   
+   
+   
+   
+   
+   DrawAllObjects();
+   
+   
+   
+   AudioLibrary_deinit();
+}
