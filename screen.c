@@ -49,8 +49,8 @@ void Screen_SetCurPos(int x, int y)
 //Plots char into the buffer
 void Screen_PlotChar(Screen_drawParams *Params)
 {
-   if(Params->x > SCREEN_HEIGHT || Params->y > SCREEN_WIDTH || Params->x < 0 || Params->y <0){
-	   printf("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+   if(Params->x >= SCREEN_HEIGHT || Params->y >=SCREEN_WIDTH || Params->x < 0 || Params->y <0){
+	  // printf("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 	   return;
    }
     Screen_Buffer_new[Params->x][Params->y] = *Params;
