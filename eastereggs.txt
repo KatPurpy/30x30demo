@@ -1,0 +1,6 @@
+--jump-part 0/1/2/3/4/5 - jump to a part
+--show-fact 0/1/2/3/4 - show a thirty fact
+--no-sound - no sound lol
+-30 - print 30 for whole infinity
+--pallet-shift N - shift pallet by N
+--thanks-message N - replace "Thanks for watching my demo!" by some other text (max - 28 characters)
