@@ -87,42 +87,71 @@ int plot (int x,int y){
 	DrawChar(x,y,219,rand()%15+1);
 	return FALSE;
 }
-void plotLine (int x0, int y0, int x1, int y1)
+int sign(int x)
 {
-	
-     int deltax = abs(x1 - x0);
-     int deltay = abs(y1 - y0);
-     int error = 0;
-     int deltaerr = deltay;
-     int y = y0;
-     int diry = y1 - y0;
-	 int dirx = x1-x0;
-	if (diry > 0)   diry = 1;
-     if (diry < 0 )  diry = -1;   
-	 for (int x = x0; x< x1;x++){
-         plot(x,y);
-         error = error + deltaerr;
-         if (2 * error >= deltax){          
-		 y = y + diry;
-             error = error - deltax;
-	 }
-	 }
+if(x>0)
+ return 1;
+else if(x<0)
+ return -1;
+else
+ return 0;
 }
-		
+
+
+void plotLine(int x1,int y1, int x2, int y2)
+{
+int x,y,dx,dy,swap,temp,s1,s2,p,i;
+
+x=x1;
+y=y1;
+dx=abs(x2-x1);
+dy=abs(y2-y1);
+s1=sign(x2-x1);
+s2=sign(y2-y1);
+swap=0;
+plot(x1,y1);
+if(dy>dx)
+ {
+ temp=dx;
+ dx=dy;
+ dy=temp;
+ swap=1;
+ }
+p=2*dy-dx;
+for(i=0;i<dx;i++)
+ {
+ plot(x,y);
+ while(p>=0)
+  {
+  p=p-2*dx;
+  if(swap)
+   x+=s1;
+  else
+   y+=s2;
+  }
+ p=p+2*dy;
+ if(swap)
+  y+=s2;
+ else
+  x+=s1;
+ }
+plot(x,y);
+}	
 ///////////////////////////////////////////
 
 void rotate(int point_x, int point_y, int center_x,int center_y, float angle, int *out_x,int *out_y){
-            angle = (angle ) * (3.14f/180); // Convert to radians
-            int rotatedX = cos(angle) * (point_x - center_x) - sin(angle) * (point_y-center_y) + center_x;
-            int rotatedY = sin(angle) * (point_x - center_x) + cos(angle) * (point_y - center_y) + center_y;
+            angle = (angle ) * (M_PI/180); // Convert to radians
+            int rotatedX = cos(angle) * (float)(point_x - center_x) - sin(angle) * (float)(point_y-center_y) + center_x;
+            int rotatedY = sin(angle) * (float)(point_x - center_x) + cos(angle) * (float)(point_y - center_y) + center_y;
 			*out_x = rotatedX;
 			*out_y = rotatedY;
 }
 void DrawPsychoDelic1(int f){
 	plotLine(0,sin(f*0.1f)*15+14,29,cos(f*0.1f)*15+14);
-	DrawChar(0,sin(f*0.1f)*15+14,'0',15);
-	DrawChar(29,cos(f*0.1f)*15+14,'1',15);
+	DrawChar(0,sin(f*0.1f)*15+14,'3',15);
+	DrawChar(29,cos(f*0.1f)*15+14,'0',15);
 }
+
 void ShowFact(const char *Fact){
 	int first_line_length;
 	
@@ -144,6 +173,7 @@ int main()
 	srand(time(NULL));
    Screen_Setup();
    AudioLibrary_init();
+SetConsoleTitle("30x30 by Kat Purpy");
    char PurpyLogo[26][25]=
 {
 {" B                   B "},
@@ -185,9 +215,9 @@ char *InterestingFacts[5]={
      {
 	ObjectsHeap[i] = 0;
      }
-
    //payloads stuff
-   
+      AudioLibrary_LoadSound(0,"ost.sunvox");
+   AudioLibrary_PlaySound(0,0,128);
    for(int x = 0; x<25; x++)for(int y=0;y<23;y++){
 	 CreateObject(y+3,x+2,219,
 	   PurpyLogo[x][y] == 'B' ? 0 :
@@ -263,8 +293,8 @@ ShowFact(InterestingFacts[0]);
   FreeObjects();
   //////////SOME PSYCHODELIC LINES////////
 	
-   Object* a = CreateObject(15,16,'A',15);
-   Object* b = CreateObject(15,15,'B',15);
+   Object* a = CreateObject(15,16,'0',15);
+   Object* b = CreateObject(15,15,'3',15);
 
    for(int f = 0; f < 75; f++){
 	   rotate(a->x,a->y,15,15,22,&a->x,&a->y);
@@ -278,24 +308,33 @@ ShowFact(InterestingFacts[0]);
 	   Screen_DrawBuffer();
 	   Sleep(50);
    }
-    ShowFact(InterestingFacts[1]);
-   for(int f = 75; f < 200; f++){
-	   rotate(a->x,a->y,b->x,b->y,22,&a->x,&a->y);
-	   rotate(b->x,b->y,15,20,45,&b->x,&b->y);
-	   
-	   plotLine(a->x,a->y,b->x,b->y);
-	   
-	   Screen_PlotText(0,15,"UNDER DEVELOPMENT",rand());
-	   
+ TRIANGLE:;
+FreeObjects();   
+  ShowFact(InterestingFacts[1]);
+     
+Object* triangle[3] = {CreateObject(0,30,'0',15), CreateObject(15,5,'1',15),CreateObject(30,30,'2',15)};
+   
+   
+   for(int f = 0; f < 100; f++){
+		
+		for(int i = 0; i<3; i++){rotate(triangle[i]->x,triangle[i]->y,15,15,45,&triangle[i]->x,&triangle[i]->y);
+		
+	   plotLine(triangle[i]->x,triangle[i]->y,triangle[(i+1)%2]->x,triangle[(i+1)%2]->y);
+	   }
+	   plotLine(triangle[0]->x,triangle[0]->y,triangle[6]->x,triangle[6]->y);
 	   DrawAllObjects();
-		printf("30!");
+	
 	   Screen_DrawBuffer();
 	   Sleep(50);
    }
     ShowFact(InterestingFacts[2]);
-   for(int f = 200; f < 250; f++){
+   for(int f = 200; f < 300; f++){
 	   rotate(a->x,a->y,15,15,22,&a->x,&a->y);
-	   
+	   for(int i = 0; i<3; i++){rotate(triangle[i]->x,triangle[i]->y,15,15,45,&triangle[i]->x,&triangle[i]->y);
+		
+	   plotLine(triangle[i]->x,triangle[i]->y,triangle[(i+1)%2]->x,triangle[(i+1)%2]->y);
+	   }
+	   plotLine(triangle[0]->x,triangle[0]->y,triangle[6]->x,triangle[6]->y);
 	   DrawPsychoDelic1(cos(f*0.1f)*30+10);
 	   DrawPsychoDelic1(cos(f*0.1f)*30+20);
 	   DrawPsychoDelic1(cos(f*0.1f)*30);
@@ -336,6 +375,7 @@ ShowFact(InterestingFacts[0]);
 	   Screen_DrawBuffer();
 	   Sleep(50);
    }
+   
    FreeObjects();
    char *Bye = "Thanks for watching my demo!";
    Object *Thank[28];
@@ -344,7 +384,7 @@ ShowFact(InterestingFacts[0]);
 	   CreateBall(rand()%4-2,rand()%4-2,Thank[i]);
 	   DrawAllObjects();
 	   Screen_DrawBuffer();
-	   
+	   Beep(300, 50);
 	   Sleep(50);
    }
    Sleep(5000);
@@ -352,7 +392,7 @@ ShowFact(InterestingFacts[0]);
 	   for(int i = 0; i < 28; i++)UpdateBall(Thank[i],0);
 	    DrawAllObjects();
 	   Screen_DrawBuffer();
-	   
+	   Beep(300-((300/70)*f)+100, 50);
 	   Sleep(50);
    }
    FreeObjects();

@@ -19,7 +19,7 @@ void AudioLibrary_LoadSound(int slot,char*path){
 }
 void AudioLibrary_PlaySound(int slot,int autoplay,int volume){
 	sv_play_from_beginning(slot);
-	sv_set_autostop(slot,autoplay);
+	sv_set_autostop(slot,!autoplay);
 	sv_volume(slot,volume);
 }
 void AudioLibrary_StopMusic(int slot){
