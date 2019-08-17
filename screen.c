@@ -15,6 +15,7 @@ typedef struct
     char Character;
 } Screen_drawParams;
 
+int PALLETE_SHIFT = 0;
 
 Screen_drawParams Screen_Buffer_old[SCREEN_WIDTH][SCREEN_HEIGHT];
 Screen_drawParams Screen_Buffer_new[SCREEN_WIDTH][SCREEN_HEIGHT];
@@ -57,7 +58,7 @@ void Screen_PlotChar(Screen_drawParams *Params)
 }
 void Screen_PlotCharDirectly(Screen_drawParams *Params){
 if(Params->Character==-1)return;
-Screen_SetColor(Params->color_flags);
+Screen_SetColor(Params->color_flags + PALLETE_SHIFT);
     Screen_SetCurPos(Params->x, Params->y);
     putchar(Params->Character);
 }

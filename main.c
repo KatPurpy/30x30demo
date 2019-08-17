@@ -12,6 +12,8 @@ typedef struct Object
 
 Object *ObjectsHeap[901];
 
+
+
 Object* CreateObject(int x,int y,int character,int color)
 {
    int ID = 0;
@@ -161,19 +163,73 @@ void ShowFact(const char *Fact){
 			break;
 		}
 	}
-	
+	Screen_DrawBox(0,0,30,30,0,0);
 	Screen_PlotText(30/2-strlen("INTERESTING FACT")/2,7,"INTERESTING FACT",rand()%15+1);
 	Screen_PlotText(30/2-first_line_length/2,15,Fact,rand()%15+1);
 	Screen_DrawBuffer();
 	Sleep(5000);
 }
-
-int main()
+int DoesStringBeginWith(const char* string, const char *beginning)
 {
-	srand(time(NULL));
+   int truth = 0;
+   int count = strlen(beginning);
+   for(int i =0; i<count; i++)
+     {
+	if(string[i] == beginning[i])
+	  {
+	     truth++;
+	  }
+	
+     }
+   return truth == count;
+}
+
+char *Bye = "Thanks for watching my demo!";
+
+int Goto = 0;
+int Sound = 1;
+int ShowFactAndQuit = 0;
+int Fact2Show = 0;
+
+int main(int argc,char**argv,char **envp)
+{srand(time(NULL));
+	for(int i = 0; i < 901; i++)ObjectsHeap[i] = 0;
+     
+	printf( "\nCommand-line arguments:\n" );
+    for(int count = 0; count < argc; count++ ){
+		printf( "  argv[%d]   %s\n", count, argv[count] );
+		
+        if(strcmp(argv[count],"-30")==0 || strcmp(argv[count],"-thirty")==0)while(1){printf("30!");}
+		if(strcmp(argv[count],"-mute") ==0) Sound = 0;
+		if(DoesStringBeginWith(argv[count],"--")){
+			
+			printf("GOT AN ARGUMENT %s with parameter %s!\n",argv[count],argv[count+1]);
+			if(DoesStringBeginWith(argv[count],"--pallete-shift")){
+				PALLETE_SHIFT = atoi(argv[count+1]);
+			}
+			if(DoesStringBeginWith(argv[count],"--thanks-message")){
+				Bye = argv[count+1];
+			}
+			if(DoesStringBeginWith(argv[count],"--jump-to")){
+				Goto = atoi(argv[count+1]);
+			}
+			if(DoesStringBeginWith(argv[count],"--show-fact")){
+				ShowFactAndQuit = 1;
+				Fact2Show = rand()%5;
+			}
+		}
+		
+	}
+   
+
+	
    Screen_Setup();
+  if(Sound){
    AudioLibrary_init();
-SetConsoleTitle("30x30 by Kat Purpy");
+   
+   AudioLibrary_LoadSound(0,"ost.sunvox");
+   AudioLibrary_PlaySound(0,0,128);
+   }SetConsoleTitle("30x30 by Kat Purpy");
    char PurpyLogo[26][25]=
 {
 {" B                   B "},
@@ -209,15 +265,19 @@ char *InterestingFacts[5]={
 	"Adding up some subsets \nof its divisors(e.g., 5\n, 10 and 15) gives 30, \nhence 30 is a semiperfe\nct number",
 	"Thirty is the sum of the\nfirst four squares,\nwhich makes it a\nsquare pyramidal number"
 };
+   Screen_DrawBox(0,0,30,30,0,0);
+   if(ShowFactAndQuit){ShowFact(InterestingFacts[Fact2Show]);exit(0);};
+   switch(Goto){
+	   case 0:break;
+	   case 1:goto BALLS;break;
+	   case 2:goto LINES1;break;
+	   case 3:goto TRIANGLE;break;
+	   case 4:goto LINES2;break;
+	   case 5:goto THANKS;break;
+   }
    
-   
-   for(int i = 0; i < 901; i++)
-     {
-	ObjectsHeap[i] = 0;
-     }
    //payloads stuff
-      AudioLibrary_LoadSound(0,"ost.sunvox");
-   AudioLibrary_PlaySound(0,0,128);
+  
    for(int x = 0; x<25; x++)for(int y=0;y<23;y++){
 	 CreateObject(y+3,x+2,219,
 	   PurpyLogo[x][y] == 'B' ? 0 :
@@ -227,7 +287,9 @@ char *InterestingFacts[5]={
 	   );
 
    }
+   
     Screen_DrawBox(0,0,30,30,203,219);
+	
 	for(int i = 0; i< 25*23;i++)if(i%2==0)ObjectsHeap[i]->x -= 30; else ObjectsHeap[i]->x += 30;
    Sleep(1000);
    int I = 0;
@@ -247,6 +309,7 @@ char *InterestingFacts[5]={
    Screen_PlotText(30/2-18/2,30/2+4,"Kat Purpy presents",2);
    Screen_DrawBuffer();
    Sleep(5000);
+   
    ///////////////////////////
    //////////Hide Kat Purpy
    for(int I = 0; I < 30; I++){
@@ -259,6 +322,11 @@ char *InterestingFacts[5]={
 
    Sleep(50);
    }
+   ///FREE OBJECTS FOR NEXT SCENE
+   //BALLS STUFF
+   
+   BALLS:;
+   FreeObjects();
    for (int I = 0; I<15; I++){
 	    Screen_PlotText(30/2-3,I,"30x30",2);
 		Screen_DrawBuffer();
@@ -266,10 +334,10 @@ char *InterestingFacts[5]={
    Sleep(50);
    }
    Sleep(2000);
-   ///FREE OBJECTS FOR NEXT SCENE
-   FreeObjects();
-    ///Balls stuff
-   char name[]="30x30";
+   
+   
+   
+    char name[]="30x30";
    Object * Balls[10];
    for(int i = 0; i<strlen(name);i++){
 	   Screen_PlotText(30/2-3,14,"30x30",2);
@@ -281,7 +349,7 @@ char *InterestingFacts[5]={
 	   Sleep(50);
    }
    for(int f = 0; f<111; f++){
-	    for(int i = 0; i<strlen(name);i++)UpdateBall(Balls[i],f < 100);
+	    for(int i = 0; i<strlen(name)-1;i++)UpdateBall(Balls[i],f < 100);
 		DrawAllObjects();
 	   Screen_DrawBuffer();
 	   Sleep(50);
@@ -289,7 +357,7 @@ char *InterestingFacts[5]={
   ////////////////////////////
 ShowFact(InterestingFacts[0]);
   
-  LINES:;
+  LINES1:;
   FreeObjects();
   //////////SOME PSYCHODELIC LINES////////
 	
@@ -308,33 +376,36 @@ ShowFact(InterestingFacts[0]);
 	   Screen_DrawBuffer();
 	   Sleep(50);
    }
- TRIANGLE:;
-FreeObjects();   
+
+
   ShowFact(InterestingFacts[1]);
-     
+   TRIANGLE:;
+  FreeObjects();   
+LINES2:;  
 Object* triangle[3] = {CreateObject(0,30,'0',15), CreateObject(15,5,'1',15),CreateObject(30,30,'2',15)};
-   
-   
+   //if need to go to LINES2 then first init triangle then go to the lines2;
+   if(Goto == 4) goto _LINES2;
    for(int f = 0; f < 100; f++){
 		
 		for(int i = 0; i<3; i++){rotate(triangle[i]->x,triangle[i]->y,15,15,45,&triangle[i]->x,&triangle[i]->y);
 		
 	   plotLine(triangle[i]->x,triangle[i]->y,triangle[(i+1)%2]->x,triangle[(i+1)%2]->y);
 	   }
-	   plotLine(triangle[0]->x,triangle[0]->y,triangle[6]->x,triangle[6]->y);
+	   plotLine(triangle[0]->x,triangle[0]->y,triangle[2]->x,triangle[2]->y);
 	   DrawAllObjects();
 	
 	   Screen_DrawBuffer();
 	   Sleep(50);
    }
     ShowFact(InterestingFacts[2]);
+   _LINES2:;
    for(int f = 200; f < 300; f++){
-	   rotate(a->x,a->y,15,15,22,&a->x,&a->y);
+	   //rotate(a->x,a->y,15,15,22,&a->x,&a->y);
 	   for(int i = 0; i<3; i++){rotate(triangle[i]->x,triangle[i]->y,15,15,45,&triangle[i]->x,&triangle[i]->y);
 		
 	   plotLine(triangle[i]->x,triangle[i]->y,triangle[(i+1)%2]->x,triangle[(i+1)%2]->y);
 	   }
-	   plotLine(triangle[0]->x,triangle[0]->y,triangle[6]->x,triangle[6]->y);
+	   plotLine(triangle[0]->x,triangle[0]->y,triangle[2]->x,triangle[2]->y);
 	   DrawPsychoDelic1(cos(f*0.1f)*30+10);
 	   DrawPsychoDelic1(cos(f*0.1f)*30+20);
 	   DrawPsychoDelic1(cos(f*0.1f)*30);
@@ -375,28 +446,28 @@ Object* triangle[3] = {CreateObject(0,30,'0',15), CreateObject(15,5,'1',15),Crea
 	   Screen_DrawBuffer();
 	   Sleep(50);
    }
-   
+   THANKS:;
    FreeObjects();
-   char *Bye = "Thanks for watching my demo!";
+   
    Object *Thank[28];
-   for(int i = 0; i < 28; i++){
-	   Thank[i] = CreateObject(i%30,15,Bye[i ==0?0 :i%29],rand()%15+1);
+   for(int i = 0; i < strlen(Bye); i++){
+	   Thank[i] = CreateObject(i%30,15,Bye[i ==0?0 :i%strlen(Bye)],rand()%15+1);
 	   CreateBall(rand()%4-2,rand()%4-2,Thank[i]);
 	   DrawAllObjects();
 	   Screen_DrawBuffer();
-	   Beep(300, 50);
+	 if(Sound)   Beep(300, 50);
 	   Sleep(50);
    }
    Sleep(5000);
    for(int f = 0; f < 70; f++){
-	   for(int i = 0; i < 28; i++)UpdateBall(Thank[i],0);
+	   for(int i = 0; i < strlen(Bye); i++)UpdateBall(Thank[i],0);
 	    DrawAllObjects();
 	   Screen_DrawBuffer();
-	   Beep(300-((300/70)*f)+100, 50);
+	 if(Sound)   Beep(300-((300/70)*f)+100, 50);
 	   Sleep(50);
    }
    FreeObjects();
    Screen_Clear();
    
-   AudioLibrary_deinit();
+   if(Sound)AudioLibrary_deinit();
 }

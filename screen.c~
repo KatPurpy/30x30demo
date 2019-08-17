@@ -15,6 +15,7 @@ typedef struct
     char Character;
 } Screen_drawParams;
 
+int PALLETE_SHIFT = 0;
 
 Screen_drawParams Screen_Buffer_old[SCREEN_WIDTH][SCREEN_HEIGHT];
 Screen_drawParams Screen_Buffer_new[SCREEN_WIDTH][SCREEN_HEIGHT];
@@ -49,6 +50,10 @@ void Screen_SetCurPos(int x, int y)
 //Plots char into the buffer
 void Screen_PlotChar(Screen_drawParams *Params)
 {
+   if(Params->x >= SCREEN_HEIGHT || Params->y >=SCREEN_WIDTH || Params->x < 0 || Params->y <0){
+	  // printf("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+	   return;
+   }
     Screen_Buffer_new[Params->x][Params->y] = *Params;
 }
 void Screen_PlotCharDirectly(Screen_drawParams *Params){
